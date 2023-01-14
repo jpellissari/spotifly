@@ -1,0 +1,8 @@
+<h2 class="title">Artists</h2>
+
+<div class="artists-grid">
+  <div *ngFor="let artist of artists" class="artists-card">
+    <img [src]="artist.thumbnail" />
+    <span>{{ artist.name }}</span>
+  </div>
+</div>

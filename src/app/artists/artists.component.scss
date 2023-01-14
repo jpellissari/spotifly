@@ -1,0 +1,41 @@
+.title {
+  color: #ffffff;
+  margin-bottom: 30px;
+}
+
+.artists-grid {
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  flex-flow: wrap;
+  gap: 28px;
+
+  .artists-card {
+    background-color: #181818;
+    width: 160px;
+    min-width: 160px;
+    height: 210px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 4%;
+    cursor: pointer;
+    transition: all ease 0.4s;
+
+    img {
+      height: 160px;
+      width: 160px;
+      border-radius: 50%;
+    }
+
+    span {
+      color: #fff;
+      font-weight: 500;
+      margin-top: 20px;
+    }
+
+    &:hover {
+      background-color: #252525;
+    }
+  }
+}
