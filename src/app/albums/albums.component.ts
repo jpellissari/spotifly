@@ -13,19 +13,9 @@ export class AlbumsComponent implements OnInit {
   constructor(private albumsService: AlbumsService) {}
 
   ngOnInit(): void {
-    this.albumsService.getSavedAlbums().subscribe((data) => {
+    this.albumsService.getAllSavedAlbums().subscribe((data) => {
       console.log(data);
-      data.map((album: any) => {
-        this.albums.push(
-          Object.assign(
-            {},
-            {
-              name: album.album.name,
-              thumbnail: album.album.images[0].url,
-            }
-          )
-        );
-      });
+      this.albums = data;
     });
   }
 }

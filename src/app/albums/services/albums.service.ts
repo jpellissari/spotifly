@@ -1,62 +1,46 @@
 import { Injectable } from '@angular/core';
+import { EMPTY, expand, map, Observable, reduce, tap } from 'rxjs';
 import {
-  EMPTY,
-  expand,
-  map,
-  mergeMap,
-  Observable,
-  of,
-  reduce,
-  switchMap,
-  tap,
-  toArray,
-} from 'rxjs';
-import { SpotifyService } from 'src/app/shared/services/spotify.service';
-
-interface ISpotifyImage {
-  url: string;
-  height: number;
-  width: number;
-}
-
-export interface ISpotifyAlbum {
-  album: {
-    id: string;
-    images: ISpotifyImage[];
-    name: string;
-    artists: {
-      id: string;
-      images: ISpotifyImage[];
-      name: string;
-    }[];
-  };
-}
-
-export interface ISpotifySavedAlbums {
-  items: ISpotifyAlbum[];
-  next: string | null;
-  total: number;
-}
+  ISpotifyAlbum,
+  SpotifyService,
+} from 'src/app/shared/services/spotify.service';
+import { Album } from '../models/album';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlbumsService {
   constructor(private spotifyService: SpotifyService) {}
-  getSavedAlbums(): Observable<ISpotifyAlbum[]> {
-    return this.spotifyService.get<any>('/me/albums?limit=50').pipe(
-      expand<ISpotifySavedAlbums, Observable<ISpotifySavedAlbums>>((data) => {
+  private getNextOffset(nextUrl: string): number {
+    const urlParams = new URLSearchParams(nextUrl.split('albums')[1]);
+    const offset = urlParams.get('offset');
+
+    return offset ? parseInt(offset) : 0;
+  }
+
+  getAllSavedAlbums(): Observable<Album[]> {
+    return this.spotifyService.getSavedAlbums({}).pipe(
+      expand((data) => {
         if (data.next) {
-          return this.spotifyService.getFromURL(data.next);
+          return this.spotifyService.getSavedAlbums({
+            offset: this.getNextOffset(data.next),
+          });
         }
         return EMPTY;
       }),
-      reduce(
-        (accumulator: ISpotifyAlbum[], savedAlbums: ISpotifySavedAlbums) => {
-          accumulator = [...accumulator, ...savedAlbums.items];
-          return accumulator;
-        },
-        []
+      reduce((accumulator: ISpotifyAlbum[], savedAlbums) => {
+        accumulator = [...accumulator, ...savedAlbums.items];
+        return accumulator;
+      }, []),
+      map((savedAlbums) =>
+        savedAlbums.map((savedAlbum) => {
+          const album: Album = {
+            name: savedAlbum.album.name,
+            thumbnail: savedAlbum.album.images[0].url,
+          };
+
+          return album;
+        })
       )
     );
   }

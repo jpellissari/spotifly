@@ -8,7 +8,7 @@ interface ISpotifyImage {
   width: number;
 }
 
-interface ISpotifyAlbum {
+export interface ISpotifyAlbum {
   album: {
     id: string;
     images: ISpotifyImage[];
@@ -27,6 +27,11 @@ interface ISpotifySavedAlbums {
   total: number;
 }
 
+interface IGetSavedAlbumsRequest {
+  limit?: number;
+  offset?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -35,14 +40,15 @@ export class SpotifyService {
 
   constructor(private http: HttpClient) {}
 
-  getSavedAlbums(
-    limit?: number,
-    offset?: number
-  ): Observable<ISpotifySavedAlbums> {
+  getSavedAlbums({
+    offset = 0,
+    limit = 50,
+  }: IGetSavedAlbumsRequest): Observable<ISpotifySavedAlbums> {
     const url = `${this.baseUrl}/me/albums?limit=${limit}&offset=${offset}`;
+    console.log(url);
     const headers = new HttpHeaders({
       Authorization:
-        'Bearer BQDckD5hCwlNt3-HMCK7ASlVsCPJGvGIvgbFvneh0rEW86J8SPjxaS30GMC_wiVoKasLJvFuZ8RBSnFjTdAYS7cwva6wmDDgv-Ic14JaWOdJMYTMWFfYpQJlbSYCcSvyEx7K_zUz_CnFWdMYnCa9oePCFeLwC8W5MQS3MKG-p3VqnNChDYSO9p7-MgKm0A',
+        'Bearer BQB05_CakAD52C0KHiOJkqDKv3r1Kr_9vf7p6BMOiACxpvbBQ4TYpQO_izGpux1juqYTrNP361jnlx5QVgckSSnGngOgUkpuZd0SJXJ0HcnwNxUwcQLfCUjEXG9nyPKamIN9yBZcM1VB5bsAlEMZiVW1VJtkNvNfHiVy65XkPejqTr7EaFkXnx6vPH03WA',
     });
 
     return this.http.get<ISpotifySavedAlbums>(url, { headers });
